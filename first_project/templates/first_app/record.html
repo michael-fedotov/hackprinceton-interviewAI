@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Recorder</title>
+    {% load static %}
+</head>
+<body>
+    <video id="webcam" autoplay playsinline></video>
+    <button id="start">Start Recording</button>
+    <button id="stop" disabled>Stop Recording</button>
+    <script src="{% static 'videorecorder/script.js' %}"></script>
+</body>
+</html>

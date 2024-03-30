@@ -12,3 +12,6 @@ def home(request):
 
 def educative(request):
     return HttpResponse("Welcome to Educative page!")
+
+def record(request):
+    return render(request,'first_app/record.html')
