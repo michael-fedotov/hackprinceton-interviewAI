@@ -38,7 +38,7 @@ def create(request):
             ENDPOINT_COMPLETIONS = "https://api.openai.com/v1/chat/completions"
 
             # Global variables
-            API_KEY = "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"
+            API_KEY = input("put ur api key")
 
             prompt = f"Give 5 behavioural interview questions for the role of {job_title_value} with the following job description: {job_description_value}. Answer them too. Questions in single quotes and Answers in double quotes"
             GPT3 = "gpt-3.5-turbo"
