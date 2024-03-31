@@ -1,0 +1,14 @@
+<!-- review_video.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Review and Submit Video</title>
+</head>
+<body>
+    <video src="{{ video_url }}" controls></video>
+    <form action="{% url 'process_video' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Submit Video</button>
+    </form>
+</body>
+</html>

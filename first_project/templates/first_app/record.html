@@ -3,11 +3,17 @@
 <head>
     <title>Video Recorder</title>
     {% load static %}
+    <link rel="stylesheet" href="{% static 'first_app/video_recorder_styles.css' %}">
 </head>
 <body>
-    <video id="webcam" autoplay playsinline></video>
-    <button id="start">Start Recording</button>
-    <button id="stop" disabled>Stop Recording</button>
+    <video id="webcam" autoplay playsinline width="640" height="480"></video>
+    <div class="controls">
+        <button id="start">Start Recording</button>
+        <button id="stop" disabled>Stop Recording</button>
+    </div>
+    <!-- Video element for playback -->
+    <video id="playback" width="640" height="480" controls hidden></video>
+    
     <script src="{% static 'first_app/script.js' %}"></script>
 </body>
 </html>
