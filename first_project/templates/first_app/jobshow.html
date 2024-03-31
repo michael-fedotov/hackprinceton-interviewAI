@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Show{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Job Show</h2>
+    <table>
+        <tr>
+            <th>Question #</th>
+            <th>Question</th>
+            <th>Answer</th>
+        </tr>
+        {% for question, answer in questions.items %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ question }}</td>
+            <td>
+                <button onclick="toggleAnswer('answer{{ forloop.counter }}')">Show Answer</button>
+                <div id="answer{{ forloop.counter }}" class="answer" style="display: none;">{{ answer }}</div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<script>
+    function toggleAnswer(id) {
+        var answer = document.getElementById(id);
+        answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+{% endblock %}

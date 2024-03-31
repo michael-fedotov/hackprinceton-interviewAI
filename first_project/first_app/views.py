@@ -1,87 +1,94 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.http import JsonResponse
-from moviepy.editor import VideoFileClip
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, redirect
-# from emotion import get_emotion_dict
-from django.core.files.storage import default_storage
 import os
+from os import listdir
 
-current_dir = os.path.dirname(__file__)
-sister_dir = os.path.abspath(os.path.join(current_dir, '..', 'Candidate_analysis'))
-file_path = os.path.join(sister_dir, 'emotion.py')
+import requests
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
+from pymongo import MongoClient
+
+from .forms import CreateNewList
+
+cluster = "mongodb+srv://jacobcardoso2003:1zNz02Yng4ktFoqC@cluster1.xzwx6n8.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster1"
+client = MongoClient(cluster)
+print(client.list_database_names())
+
+db = client.test
+
+print(db.list_collection_names())
 
 
 # Create your views here.
 
+
 def index(request):
-    tv_shows_list={"tv_shows":{'Game of Thrones':'9.3','Blacklist': '8','Suits': '8.5','The Witcher': '8.5'}}
-    return render(request,'first_app/index.html',context=tv_shows_list)
+    tv_shows_list = {
+        "tv_shows": {
+            "Game of Thrones": "9.3",
+            "Blacklist": "8",
+            "Suits": "8.5",
+            "The Witcher": "8.5",
+        }
+    }
+    return render(request, "first_app/index.html", context=tv_shows_list)
+
 
 def home(request):
     return HttpResponse("Welcome to home page!")
 
-def educative(request):
-    return HttpResponse("Welcome to Educative page!")
 
-def record(request):
-    return render(request,'first_app/record.html')
+def create(request):
+    if request.method == "POST":
+        form = CreateNewList(request.POST)
 
-@csrf_exempt 
-def upload_video(request):
-    if request.method == 'POST':
-        video_file = request.FILES.get('video')
-        if not video_file:
-            return JsonResponse({'error': 'No video file uploaded.'}, status=400)
-        
-        # Define save path
-        save_path = 'uploaded_videos'
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-        # print('hello')
-        # Save video file
-        video_file_path = default_storage.save(os.path.join(save_path, video_file.name), video_file)
-        # request.session['emotions_dict'] = video_file_path
-        # return render(request, 'first_app/review_video.html', {'video_url': video_file_path})
-        # print(request.session['emotions_dict'])
-        try:
-            # Process video to extract audio
-            clip = VideoFileClip(video_file_path)
+        if form.is_valid():
+            job_title_value = form.cleaned_data["job_title"]
+            job_description_value = form.cleaned_data["job_description"]
 
-            # Limit video duration to 1 minute
-            if clip.duration > 60:
-                clip = clip.subclip(0, 60)  # Keep only the first minute
+            ENDPOINT_COMPLETIONS = "https://api.openai.com/v1/chat/completions"
 
-            # Write video file as mp4
-            video_output_path = os.path.splitext(video_file_path)[0] + '.mp4'
-            clip.write_videofile(video_output_path, codec='libx264', audio_codec='aac')
-            # request.session['emotions_dict'] = (video_file_path)
-            # Return response with the path to the converted video
+            # Global variables
 
-            request.session['video_output_path'] = video_output_path
-            return redirect(('review_video'))
-            return JsonResponse({
-                'message': 'File uploaded and processed successfully.',
-                'video_path': video_output_path,
-            })
-        except Exception as e:
-            # request.session['video_output_path'] = video_output_path
-            return redirect(('/review_video'))
-            # Log the error
-            print(f"Error processing video: {str(e)}")
-            return JsonResponse({'error': 'Failed to process uploaded video.'}, status=500)
+            prompt = f"Give 5 behavioural interview questions for the role of {job_title_value} with the following job description: {job_description_value}. Answer them too. Questions in single quotes and Answers in double quotes"
+            GPT3 = "gpt-3.5-turbo"
+
+            # Sends the request to the API
+            response = requests.post(
+                ENDPOINT_COMPLETIONS,
+                json={"model": GPT3, "messages": [{"role": "user", "content": prompt}]},
+                headers={
+                    "Content-type": "application/json",
+                    "Authorization": f"Bearer {API_KEY}",
+                },
+            )
+
+            # Extracts the data from the response
+            data = response.json()
+
+            sections = data["choices"][0]["message"]["content"].split(
+                "\n\n"
+            )  # Assuming each section is separated by two newline characters
+            global qa_pairs
+            qa_pairs = {}
+            for section in sections:
+                if section.strip():  # Ignore empty sections
+                    lines = section.split("\n")
+                    question = lines[0].strip()
+                    answer = "\n".join(lines[1:]).strip()
+                    qa_pairs[question] = answer
+                    todo1 = {"question": question, "answer": answer}
+
+                    todos = db.todos
+
+                    result = todos.insert_one(todo1)
+
+            return HttpResponseRedirect(reverse("jobshow"))
+
     else:
-        return JsonResponse({'error': 'Invalid request'}, status=400)
-    
+        form = CreateNewList()
+
+        return render(request, "first_app/create.html", {"form": form})
 
 
-def review_video(request):
-    video_output_path = request.session.get('video_output_path')
-    if not video_output_path:
-        # Redirect or show an error if there's no video path stored in session
-        return redirect('/')  # Adjust as necessary
-
-    context = {'video_url': video_output_path}
-    return render(request, 'first_app/review_video.html', {'video_url': video_output_path})
-
+def jobshow(request):
+    return render(request, "first_app/jobshow.html", context={"questions": qa_pairs})
