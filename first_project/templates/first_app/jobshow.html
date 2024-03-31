@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My second Application</title>
+</head>
+<body>
+    <table style="width:100%; text-align:center">
+    <tr>
+         <th>Question #</th>
+        <th>Question</th>
+    </tr>
+    {% for question,answer in questions.items %}
+    <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{question}}</td>
+        <td>{{answer}}</td>
+    </tr>
+    {% endfor %}
+    </table>
+    
+</body>
+</html>
