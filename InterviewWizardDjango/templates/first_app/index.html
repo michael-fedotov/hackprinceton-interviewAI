@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Page with Button</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background: rgb(111, 90, 126);
+            background: linear-gradient(0deg, rgba(111, 90, 126, 1) 16%, rgba(205, 102, 132, 1) 33%, rgba(255, 103, 125, 1) 53%, rgba(255, 174, 143, 1) 78%);
+            font-family: Arial, sans-serif;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: 2px solid rgba(255, 255, 255, 0.5); /* Semi-transparent white outline */
+            border-radius: 50px;
+            background-color: transparent;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff; /* Text color */
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px; /* Add margin to separate from the text */
+        }
+
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white background on hover */
+        }
+
+        a {
+            text-decoration: none; /* Remove underline from anchor */
+        }
+
+        .title {
+            font-size: 64px; /* Increased font size */
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px; /* Add margin at the bottom */
+        }
+
+        .description {
+            font-size: 20px; /* Adjust font size */
+            color: #fff;
+            font-style: italic; /* Italicize text */
+            margin-bottom: 20px; /* Add margin at the bottom */
+        }
+    </style>
+</head>
+<body>
+
+<div class="title">InterviewWizard</div>
+
+<div class="description">Your AI Interview Prep Tool</div>
+
+<a href="{% url 'create' %}">
+    <button>Get Started</button>
+</a>
+
+</body>
+</html>

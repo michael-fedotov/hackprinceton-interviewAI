@@ -1,0 +1,117 @@
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-size: cover;
+        background-position: center;
+        background: rgb(111, 90, 126);
+        background: linear-gradient(0deg, rgba(111, 90, 126, 1) 16%, rgba(205, 102, 132, 1) 33%, rgba(255, 103, 125, 1) 53%, rgba(255, 174, 143, 1) 78%);
+        font-family: Arial, sans-serif;
+        color: #fff;
+    }
+
+    .container {
+        width: 80%;
+        margin-top: 50px;
+    }
+
+    h2 {
+        font-size: 36px;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    tr:nth-child(even) {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    tr:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    button {
+        padding: 8px 16px;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 50px;
+        background-color: transparent;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        text-transform: uppercase;
+        font-size: 18px;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-right: 10px;
+    }
+
+    button:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .answer {
+        margin-top: 5px;
+    }
+
+    .button-container {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+    }
+    #buttonone {
+        font-size: 14px;
+    }
+</style>
+
+<div class="button-container">
+    <a href="{% url 'index' %}">
+        <button>Home </button></a>
+    <a href="{% url 'create' %}">
+        <button>Generate Questions</button>
+    </a>
+</div>
+<div class="container">
+    <h2>Practice Questions</h2>
+    <table>
+        <tr>
+            <th>Question #</th>
+            <th>Practice Question</th>
+            <th>The Wizard's Answer</th>
+        </tr>
+        {% for question, answer in questions.items %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ question }}</td>
+            <td>
+                <button id="buttonone"onclick="toggleAnswer('answer{{ forloop.counter }}')">Show Answer</button>
+                <div id="answer{{ forloop.counter }}" class="answer" style="display: none;">{{ answer }}</div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<script>
+    function toggleAnswer(id) {
+        var answer = document.getElementById(id);
+        answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
