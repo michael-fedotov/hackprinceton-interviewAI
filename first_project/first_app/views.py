@@ -4,13 +4,15 @@ from django.http import JsonResponse
 from moviepy.editor import VideoFileClip
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
-# from emotion import get_emotion_dict
+import tasks
+from .tasks import process_video_emotions
 from django.core.files.storage import default_storage
 import os
 
 current_dir = os.path.dirname(__file__)
 sister_dir = os.path.abspath(os.path.join(current_dir, '..', 'Candidate_analysis'))
-file_path = os.path.join(sister_dir, 'emotion.py')
+# file_path = os.path.join(sister_dir, 'emotion.py')
+file_path = os.path.join(sister_dir, 'tasks.py')
 
 
 # Create your views here.
@@ -42,7 +44,7 @@ def upload_video(request):
         # print('hello')
         # Save video file
         video_file_path = default_storage.save(os.path.join(save_path, video_file.name), video_file)
-        # request.session['emotions_dict'] = video_file_path
+        request.session['video_output_path'] = video_file_path
         # return render(request, 'first_app/review_video.html', {'video_url': video_file_path})
         # print(request.session['emotions_dict'])
         try:
@@ -76,12 +78,19 @@ def upload_video(request):
     
 
 
-def review_video(request):
-    video_output_path = request.session.get('video_output_path')
-    if not video_output_path:
-        # Redirect or show an error if there's no video path stored in session
-        return redirect('/')  # Adjust as necessary
 
-    context = {'video_url': video_output_path}
-    return render(request, 'first_app/review_video.html', {'video_url': video_output_path})
+def review_video(request):
+    # result = tasks.process_video_emotions.delay('/Users/michaelfedotov/Documents/Projects/DJANGO/hackprinceton-interviewAI/video1.mp4')
+    # result.wait()
+    # summary_dict = result.get()
+    video_path = request.session.get('video_output_path')
+    task = process_video_emotions.delay(video_path)
+
+    # video_output_path = request.session.get('video_output_path')
+    # if not video_output_path:
+    #     # Redirect or show an error if there's no video path stored in session
+    #     return redirect('/')  # Adjust as necessary
+
+    # context = {'video_url': video_output_path}
+    # return render(request, 'first_app/review_video.html', {'video_url': video_output_path})
 

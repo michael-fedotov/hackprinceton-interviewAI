@@ -1,39 +1,37 @@
 let startButton = document.getElementById('start');
 let stopButton = document.getElementById('stop');
+let uploadButton = document.getElementById('upload'); // Upload button
 let webcamVideo = document.getElementById('webcam');
 let playbackVideo = document.getElementById('playback');
 let recorder, stream;
-let recordedChunks = [];
-
-
+let recordedBlob;
 
 async function startRecording() {
     stream = await navigator.mediaDevices.getUserMedia({ video: true });
     webcamVideo.srcObject = stream;
-    recordedChunks = [];
+    let recordedChunks = [];
     recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-    
+
     recorder.ondataavailable = event => {
         if (event.data.size > 0) {
             recordedChunks.push(event.data);
         }
     };
-    
+
     recorder.onstop = async () => {
-        let recordedBlob = new Blob(recordedChunks, { type: 'video/webm' });
+        recordedBlob = new Blob(recordedChunks, { type: 'video/webm' });
         let url = URL.createObjectURL(recordedBlob);
-        
-        // Hide the live webcam feed and show the playback video
+
         webcamVideo.hidden = true;
         playbackVideo.hidden = false;
-        
-        // Set the recorded video for playback
+
         playbackVideo.src = url;
-        
-        // Reset the stream and recorder for another recording session
+
         stream.getTracks().forEach(track => track.stop());
+
+        uploadButton.disabled = false; // Enable the upload button after recording
     };
-    
+
     recorder.start();
     stopButton.disabled = false;
     startButton.disabled = true;
@@ -45,5 +43,34 @@ function stopRecording() {
     startButton.disabled = false;
 }
 
+// Upload video function
+async function uploadVideo() {
+    let formData = new FormData();
+    formData.append('video', recordedBlob, 'video.mp4'); // Changed to use the recordedBlob
+
+    try {
+        const response = await fetch('/upload_video/', { // Adjust the URL as necessary
+            method: 'POST',
+            body: formData,
+        });
+        if(response.ok) {
+            console.log('Video uploaded successfully');
+            const data = await response.json();
+            console.log('Server response:', data);
+        } else {
+            console.error('Upload failed');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function analyzeVideo() {
+    console.log('Analyzing the video...');
+
+}
+
 startButton.addEventListener('click', startRecording);
 stopButton.addEventListener('click', stopRecording);
+uploadButton.addEventListener('click', uploadVideo); // Event listener for the upload button
+analyzeButton.addEventListener('click', analyzeVideo);

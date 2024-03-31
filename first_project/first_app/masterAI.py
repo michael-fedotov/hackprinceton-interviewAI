@@ -1,9 +1,8 @@
+import cv2
+import matplotlib.pyplot as plt
+from deepface import DeepFace
 
 def get_emotion_dict(path):
-    import cv2
-    import matplotlib.pyplot as plt
-    from deepface import DeepFace
-
     video = cv2.VideoCapture(path)
 
     # Frames per second of the video
@@ -40,3 +39,9 @@ def get_emotion_dict(path):
     
     summary_dict = {key: (value/num_frames) for key, value in acc_dict.items()}
     return summary_dict
+
+
+
+
+path = 'first_project/uploaded_videos/video.mp4'
+emotion_dict = get_emotion_dict(path)
